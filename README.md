@@ -6,6 +6,6 @@ to help to understand better the DWH world.
 
 In the last version you will be able to compare tables by row count and perm space, you will be able to recive an allert (red cube) in case the statistics on a table are not updated since 1 week, distinguish tables and views names.
 
-![Screenshot](11d.jpg)
+![Screenshot](`11d.jpg)
 ![Screenshot](2fe.jpg)
 ![Screenshot](10.jpg)
