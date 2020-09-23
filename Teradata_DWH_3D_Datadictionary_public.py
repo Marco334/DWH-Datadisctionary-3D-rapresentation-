@@ -64,6 +64,7 @@ Auto_DEL_ALL_OBJ() #Delete preexisting objects
 Collection_MNG_1()
 #--------- COLOR MANAGEMENT
 #The four values are represented as: [Red, Green, Blue, Alpha]
+#Color_d_FL = Color_MNG_1()
 ORAN  = bpy.data.materials.new(name="Orange_T"  ) #TEBLE - set new material to variable
 ORAN.diffuse_color = (0.98,0.225,0.01,1)
 GLASS = bpy.data.materials.new(name="Glass_V" ) #VIEW - set new material to variable
@@ -93,6 +94,7 @@ for i in DB_LIST:
  QUERY_2 = str(sql_subq1)[:int(-9) ]
  QUERY_2 = str('REPLACE VIEW ')+ DB_NAME + str('.TEMP_DB_INFO_V AS (')+ QUERY_2 + str(' );')  #str('ORDER BY 3 ASC ;\n') ##TTRR
  QUERY_3 = ''.join( QUERY_2 )
+ #print(QUERY_3)
  print('EXECUTING QUERY \n')
  session.execute(QUERY_3)
  #QUERY_4 = str("SELECT DD.TABLE_NAME , TABLE_KIND,ROW_COUNT,LAST_COLLECT_S , FF.ACTUALSPACE FROM TEST_DB_PAYROLL.TEMP_DB_INFO_V as DD LEFT OUTER JOIN (SELECT DatabaseName ||'.'|| TableName AS TABLE_NAME ,MAX( LastCollectTimeStamp) AS LAST_COLLECT_S FROM DBC.STATSV WHERE StatsId = 0 AND DatabaseName = 'TEST_DB_PAYROLL'      group by 1 ) as ee      ON ee.TABLE_NAME  = DD.TABLE_NAME      LEFT OUTER JOIN (SELECT trim(DatabaseName) ||'.'|| trim(TableName) AS TABLE_NAME           ,SUM(CURRENTPERM)/(1024) AS ACTUALSPACE FROM DBC.TABLESIZE WHERE DATABASENAME = 'TEST_DB_PAYROLL' group by 1 ) AS FF ON FF.TABLE_NAME  = DD.TABLE_NAME order by 3 ;")
@@ -128,6 +130,13 @@ for i in DB_LIST:
   #print(STT_D)
   #print(MEM_D)
   #print(NOW_V)
+  #bpy.ops.mesh.primitive_cube_add( size = 1, location=( 0 ,CICLO_0, DB_FLR ) )
+  #bpy.ops.transform.resize(value=( ROW_C/100 , MEM_D/100 , OBJ_HGT) )
+  #cube  = bpy.context.selected_objects[0]
+  #bpy.context.active_object.name = str(OBJ_N)
+  #obj = bpy.context.active_object
+  #CICLO_0  = CICLO_0  +( MEM_D/2)
+  #CICLO_1  = CICLO_1  +( ROW_C/100 )
   if OBJ_T == 'T': # if the object is a Table
    CICLO_0  = CICLO_0+( MEM_D/20)
    bpy.ops.mesh.primitive_cube_add( size = 1, location=( ROW_C/100 ,CICLO_0, DB_FLR ) )
@@ -140,15 +149,16 @@ for i in DB_LIST:
    #bpy.data.collections['TABLES.001'].objects.link(obj)
    bpy.context.scene.collection.objects.unlink(obj)
    bpy.context.active_object.data.materials.append(ORAN)#add the material to the object
-   #-----------------------------------------------------------------
+   #-----------------------------NAME MANAGEMENT ------------------------------------
    font_curve = bpy.data.curves.new(type="FONT",name=OBJ_N)
-   font_curve.body = "TEBLE :"+OBJ_N
+   font_curve.body = "TEBLE :"+OBJ_N.strip()
+   str_len = len(font_curve.body.strip())
    font_obj = bpy.data.objects.new("TEXT_" + OBJ_N, font_curve)
    #bpy.ops.transform.resize(value=( ROW_C/50 , MEM_D/10 , 50) )
-   font_obj.location = (1 , CICLO_0-MEM_D/20, DB_FLR +(OBJ_HGT/2)+1)
+   font_obj.location = ((- str_len/2) - 3 , CICLO_0-MEM_D/20, DB_FLR +(OBJ_HGT/2)+1)
    bpy.data.collections['TEXT'].objects.link(font_obj)
    #bpy.context.scene.collection.objects.unlink(font_obj)
-   #-----------------------------ALLERT OLD STATISTIC ------------------------------------
+   #-----------------------------ALLERT OLD STATISTIC -------------------------------
    if STT_D < (NOW_V - pd.DateOffset(days=7)).date():
     bpy.ops.mesh.primitive_cube_add( size = 2, location=(-1,(CICLO_0-MEM_D/20)+1, DB_FLR +(OBJ_HGT/2)-1) )
     cube  = bpy.context.selected_objects[0]
@@ -173,10 +183,11 @@ for i in DB_LIST:
    bpy.context.active_object.data.materials.append(GLASS)
    #-----------------------------------------------------------------
    font_curve = bpy.data.curves.new(type="FONT",name=OBJ_N)
-   font_curve.body = "VIEW :"+OBJ_N
+   font_curve.body = "VIEW :"+OBJ_N.strip() 
+   str_len = len(font_curve.body.strip())
    font_obj = bpy.data.objects.new("TEXT_" + OBJ_N, font_curve)
    #bpy.ops.transform.resize(value=( ROW_C/50 , MEM_D/10 , 50) )
-   font_obj.location = (1 , CICLO_V, (DB_FLR +(OBJ_HGT/2)+1))
+   font_obj.location = ((- str_len/2) - 3  , CICLO_V, (DB_FLR +(OBJ_HGT/2)+1))
    bpy.data.collections['TEXT'].objects.link(font_obj)
    #bpy.context.scene.collection.objects.unlink(font_obj)
    CICLO_V = CICLO_V -10
@@ -184,8 +195,7 @@ for i in DB_LIST:
  DB_FLR  =  DB_FLR + (OBJ_HGT*(i+1)) + FLR_SEP_C #preparing for new BD Floor
  #-----------------------------------------------------------------
  print('DONE \n')
- QUERY_5 = str("DROP VIEW TEST_DB_PAYROLL.")+ DB_NAME + str(";")
- session.execute(QUERY_5)
- print( DB_NAME + 'DROPED \n')
-   
+QUERY_5 = str("DROP VIEW TEST_DB_PAYROLL.")+ DB_NAME + str(";")
+session.execute(QUERY_5)
+print( DB_NAME + 'DROPED \n')
    
