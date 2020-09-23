@@ -51,7 +51,19 @@ def Auto_DEL_ALL_OBJ():
    for object in scene.objects:
     bpy.ops.object.delete()
 
-   
+    
+def Stat_Cb_GENERATOR(COLOR_V):
+   bpy.ops.mesh.primitive_cube_add( size = 2, location=(-1,(CICLO_0-MEM_D/20)+1, DB_FLR +(OBJ_HGT/2)-1) )
+   cube  = bpy.context.selected_objects[0]
+   bpy.context.active_object.name = str(OBJ_N + "Allert")
+   obj = bpy.context.active_object
+   bpy.data.collections['STAT_ALLERT'].objects.link(obj)
+   #bpy.data.collections[''STAT_ALLERT'.001'].objects.link(obj)
+   bpy.context.scene.collection.objects.unlink(obj)
+   bpy.context.active_object.data.materials.append(COLOR_V)#add the material to the object
+    
+    
+
 Color_d_FL  = 0
 DBCONN_d_FL = 0
 OBJ_HGT     = 50
@@ -71,6 +83,8 @@ GLASS = bpy.data.materials.new(name="Glass_V" ) #VIEW - set new material to vari
 GLASS.diffuse_color = (0.1, 0.5, 0.7,0)
 ROSSO = bpy.data.materials.new(name="Red_S" ) #allert cube for old statistics
 ROSSO.diffuse_color = (1, 0, 0,0)
+VERDE = bpy.data.materials.new(name="Green_S" ) #allert cube for updated statistics
+VERDE.diffuse_color = (0, 1, 0,0)
 #--------- GESTIONE DB MULTIPLI
 DB_LIST = {0 : 'TEST_DB_PAYROLL',1 :'TEST_DB_PAYROLLS_2'}
 DB_CNT  = len(DB_LIST)
@@ -80,9 +94,6 @@ for i in DB_LIST:
  DB_NAME = DB_LIST[i]
  QUERY = str(" SELECT 'SELECT   '''||TRIM(DATABASENAME)|| '.' || TRIM(TABLENAME) || ''' '   ||  ' AS TABLE_NAME, '''||TRIM(TABLEKIND)|| ''' '   ||  ' AS TABLE_KIND,COUNT(*) AS ROW_COUNT FROM ' || TRIM(DATABASENAME) || '.' || TRIM (TABLENAME) || ' '  FROM DBC.TABLES WHERE TABLEKIND IN ('T','V')  AND DATABASENAME = '")+ DB_NAME + str("' AND TABLENAME<>'TEMP_DB_INFO_V';")
  print(DB_NAME)
- #print(QUERY)
- #QUERY =" SELECT 'SELECT   '''||TRIM(DATABASENAME)|| '.' || TRIM(TABLENAME) || ''' '   ||  ' AS TABLE_NAME, '''||TRIM(TABLEKIND)|| ''' '   ||  ' AS TABLE_KIND,COUNT(*) AS ROW_COUNT FROM ' || TRIM(DATABASENAME) || '.' || TRIM (TABLENAME) || ' '  FROM DBC.TABLES WHERE TABLEKIND IN ('T','V')  AND DATABASENAME = 'TEST_DB_PAYROLL' AND TABLENAME<>'TEMP_DB_INFO_V';"
- #QUERY  = str(" SELECT 'SELECT   '''||TRIM(DATABASENAME)|| '.' || TRIM(TABLENAME) || ''' '   ||  ' AS TABLE_NAME, '''||TRIM(TABLEKIND)|| ''' '   ||  ' AS TABLE_KIND,COUNT(*) AS ROW_COUNT FROM ' || TRIM(DATABASENAME) || '.' || TRIM (TABLENAME) || ' '  FROM DBC.TABLES WHERE TABLEKIND IN ('T','V')  AND DATABASENAME = '")+ DB_NAME + str("' AND TABLENAME<>'TEMP_DB_INFO_V';")
  QUERY_2 = []
  print('PREPARING QUERY \n')
  curr_1 =  session.execute(QUERY)
@@ -124,19 +135,6 @@ for i in DB_LIST:
   #---
   NOW_V = pd.to_datetime("now").date()
   MEM_D = float( row[4] if row[4] is not None else -90 )
-  #print(OBJ_N)
-  #print(ROW_C)
-  #print(OBJ_T)
-  #print(STT_D)
-  #print(MEM_D)
-  #print(NOW_V)
-  #bpy.ops.mesh.primitive_cube_add( size = 1, location=( 0 ,CICLO_0, DB_FLR ) )
-  #bpy.ops.transform.resize(value=( ROW_C/100 , MEM_D/100 , OBJ_HGT) )
-  #cube  = bpy.context.selected_objects[0]
-  #bpy.context.active_object.name = str(OBJ_N)
-  #obj = bpy.context.active_object
-  #CICLO_0  = CICLO_0  +( MEM_D/2)
-  #CICLO_1  = CICLO_1  +( ROW_C/100 )
   if OBJ_T == 'T': # if the object is a Table
    CICLO_0  = CICLO_0+( MEM_D/20)
    bpy.ops.mesh.primitive_cube_add( size = 1, location=( ROW_C/100 ,CICLO_0, DB_FLR ) )
@@ -159,15 +157,22 @@ for i in DB_LIST:
    bpy.data.collections['TEXT'].objects.link(font_obj)
    #bpy.context.scene.collection.objects.unlink(font_obj)
    #-----------------------------ALLERT OLD STATISTIC -------------------------------
-   if STT_D < (NOW_V - pd.DateOffset(days=7)).date():
-    bpy.ops.mesh.primitive_cube_add( size = 2, location=(-1,(CICLO_0-MEM_D/20)+1, DB_FLR +(OBJ_HGT/2)-1) )
-    cube  = bpy.context.selected_objects[0]
-    bpy.context.active_object.name = str(OBJ_N + "Allert")
-    obj = bpy.context.active_object
-    bpy.data.collections['STAT_ALLERT'].objects.link(obj)
-    #bpy.data.collections[''STAT_ALLERT'.001'].objects.link(obj)
-    bpy.context.scene.collection.objects.unlink(obj)
-    bpy.context.active_object.data.materials.append(ROSSO)#add the material to the object
+   if str(STT_D)== 'NaT' or STT_D < (NOW_V - pd.DateOffset(days=7)).date():
+   #if np.isnat(STT_D) or STT_D < (NOW_V - pd.DateOffset(days=7)).date():
+    Stat_Cb_GENERATOR(ROSSO)
+   else:
+    Stat_Cb_GENERATOR(VERDE)
+   print( DB_NAME )
+   print( OBJ_N )
+   print( STT_D )
+    #bpy.ops.mesh.primitive_cube_add( size = 2, location=(-1,(CICLO_0-MEM_D/20)+1, DB_FLR +(OBJ_HGT/2)-1) )
+    #cube  = bpy.context.selected_objects[0]
+    #bpy.context.active_object.name = str(OBJ_N + "Allert")
+    #obj = bpy.context.active_object
+    #bpy.data.collections['STAT_ALLERT'].objects.link(obj)
+    ##bpy.data.collections[''STAT_ALLERT'.001'].objects.link(obj)
+    #bpy.context.scene.collection.objects.unlink(obj)
+    #bpy.context.active_object.data.materials.append(ROSSO)#add the material to the object
    #--------------------------------------------------------------------------------------
    CICLO_0  = CICLO_0+( MEM_D/20)+2
    #---------------------------- VIEW MANAGEMENT -----------------------------------------
@@ -195,7 +200,7 @@ for i in DB_LIST:
  DB_FLR  =  DB_FLR + (OBJ_HGT*(i+1)) + FLR_SEP_C #preparing for new BD Floor
  #-----------------------------------------------------------------
  print('DONE \n')
-QUERY_5 = str("DROP VIEW TEST_DB_PAYROLL.")+ DB_NAME + str(";")
-session.execute(QUERY_5)
-print( DB_NAME + 'DROPED \n')
+ QUERY_5 = str("DROP VIEW TEST_DB_PAYROLL.")+ DB_NAME + str(";")
+ session.execute(QUERY_5)
+ print( DB_NAME + 'DROPED \n')
    
