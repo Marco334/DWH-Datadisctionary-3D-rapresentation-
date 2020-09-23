@@ -9,6 +9,7 @@ import math
  
 
 def DB_CONNECTION_MNG_1():
+   '''CONNECTION TO Teradata DWH'''
    print ( '\n INIZIO CONNESSIONE \n' )
    host,username,password = 'xxx.xxx.xxx.xxx','xxxxx', 'xxxx'
    udaExec = teradata.UdaExec (appName="HelloWorld", version="1.0",logConsole=False) 
@@ -17,7 +18,7 @@ def DB_CONNECTION_MNG_1():
    return(udaExec.connect(method="odbc", system=host,username="dbc", password="dbc"))
 
 def Collection_MNG_1():
-#--------- COLLECTION MANAGEMENT
+   '''COLLECTION MANAGEMENT'''
    collection_T = bpy.data.collections.new('TABLES')
    bpy.context.scene.collection.children.link(collection_T)
    collection_V = bpy.data.collections.new('VIEW')
@@ -53,6 +54,7 @@ def Auto_DEL_ALL_OBJ():
 
     
 def Stat_Cb_GENERATOR(COLOR_V):
+   ''' Generate cubes for Statistics Status on tables '''
    bpy.ops.mesh.primitive_cube_add( size = 2, location=(-1,(CICLO_0-MEM_D/20)+1, DB_FLR +(OBJ_HGT/2)-1) )
    cube  = bpy.context.selected_objects[0]
    bpy.context.active_object.name = str(OBJ_N + "Allert")
@@ -62,8 +64,6 @@ def Stat_Cb_GENERATOR(COLOR_V):
    bpy.context.scene.collection.objects.unlink(obj)
    bpy.context.active_object.data.materials.append(COLOR_V)#add the material to the object
     
-    
-
 Color_d_FL  = 0
 DBCONN_d_FL = 0
 OBJ_HGT     = 50
@@ -76,7 +76,6 @@ Auto_DEL_ALL_OBJ() #Delete preexisting objects
 Collection_MNG_1()
 #--------- COLOR MANAGEMENT
 #The four values are represented as: [Red, Green, Blue, Alpha]
-#Color_d_FL = Color_MNG_1()
 ORAN  = bpy.data.materials.new(name="Orange_T"  ) #TEBLE - set new material to variable
 ORAN.diffuse_color = (0.98,0.225,0.01,1)
 GLASS = bpy.data.materials.new(name="Glass_V" ) #VIEW - set new material to variable
@@ -142,7 +141,6 @@ for i in DB_LIST:
    cube  = bpy.context.selected_objects[0]
    bpy.context.active_object.name = str(OBJ_N)
    obj = bpy.context.active_object
-   #CICLO_1  = CICLO_1  +( ROW_C/100 )
    bpy.data.collections['TABLES'].objects.link(obj)
    #bpy.data.collections['TABLES.001'].objects.link(obj)
    bpy.context.scene.collection.objects.unlink(obj)
@@ -152,10 +150,8 @@ for i in DB_LIST:
    font_curve.body = "TEBLE :"+OBJ_N.strip()
    str_len = len(font_curve.body.strip())
    font_obj = bpy.data.objects.new("TEXT_" + OBJ_N, font_curve)
-   #bpy.ops.transform.resize(value=( ROW_C/50 , MEM_D/10 , 50) )
    font_obj.location = ((- str_len/2) - 3 , CICLO_0-MEM_D/20, DB_FLR +(OBJ_HGT/2)+1)
    bpy.data.collections['TEXT'].objects.link(font_obj)
-   #bpy.context.scene.collection.objects.unlink(font_obj)
    #-----------------------------ALLERT OLD STATISTIC -------------------------------
    if str(STT_D)== 'NaT' or STT_D < (NOW_V - pd.DateOffset(days=7)).date():
    #if np.isnat(STT_D) or STT_D < (NOW_V - pd.DateOffset(days=7)).date():
@@ -165,14 +161,6 @@ for i in DB_LIST:
    print( DB_NAME )
    print( OBJ_N )
    print( STT_D )
-    #bpy.ops.mesh.primitive_cube_add( size = 2, location=(-1,(CICLO_0-MEM_D/20)+1, DB_FLR +(OBJ_HGT/2)-1) )
-    #cube  = bpy.context.selected_objects[0]
-    #bpy.context.active_object.name = str(OBJ_N + "Allert")
-    #obj = bpy.context.active_object
-    #bpy.data.collections['STAT_ALLERT'].objects.link(obj)
-    ##bpy.data.collections[''STAT_ALLERT'.001'].objects.link(obj)
-    #bpy.context.scene.collection.objects.unlink(obj)
-    #bpy.context.active_object.data.materials.append(ROSSO)#add the material to the object
    #--------------------------------------------------------------------------------------
    CICLO_0  = CICLO_0+( MEM_D/20)+2
    #---------------------------- VIEW MANAGEMENT -----------------------------------------
